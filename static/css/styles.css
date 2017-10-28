@@ -1,0 +1,20 @@
+#circular-slider {
+  position: absolute;
+  width: 80%;
+  height: calc(100% / 2);
+  top: calc(100% / 4 );
+  left: 10%;
+}
+
+
+#circular-slider div {
+  position: relative;
+}
+
+#circular-slider div > img {
+  background-color: blue;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: transform ease 1s;
+}
