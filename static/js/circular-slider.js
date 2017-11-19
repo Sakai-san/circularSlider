@@ -42,12 +42,10 @@ $(function(){
     revolution(){
       const self = this;
       const slides = self.container.find(".slide");
-    //   slides.reverse();
-
       slides.each( (index, element) => {
-        const angleDegree     = self.shift[$(element).attr("src")].angleDegree;
-        const newAngleDegree  = angleDegree + 360/slides.length;
-        const newAngleRadian  = self.degreeToRadian(angleDegree);
+        const angleDegree     = self.shifts[$(element).attr("src")].angleDegree;
+        const newAngleDegree = angleDegree + 360/slides.length;
+        const newAngleRadian  = self.degreeToRadian(newAngleDegree);
         const newPosX     = self.radius * Math.cos( newAngleRadian );
         const newPosY     = self.radius * Math.sin( newAngleRadian );
         self.setShift($(element).attr("src"), newAngleDegree, newAngleRadian, newPosX, newPosY);
@@ -63,13 +61,12 @@ $(function(){
     },
 
     setShift(imageSource, angleDegree, angleRadian, coordinateX, coordinateY ){
-      this.shifts[imageSource] =
-        {
-           angleDegree  : angleDegree,
-           angleRadian  : angleRadian,
-           posX         : coordinateX,
-           posY         : coordinateY,
-        };
+      this.shifts[imageSource] = {
+         angleDegree  : angleDegree,
+         angleRadian  : angleRadian,
+         posX         : coordinateX,
+         posY         : coordinateY,
+      };
     },
 
     computeShifts(){
