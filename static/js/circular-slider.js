@@ -6,7 +6,7 @@ $(function(){
     container: null,
     items : null,
     angle : 0,
-    shifts: {},
+    slides: {},
     radius : 0,
 
     init : function(container, radius,){
@@ -19,9 +19,10 @@ $(function(){
       this.computeShifts();
       this.moveImages();
       const self = this;
-      setTimeout( function()  { self.round(); }, 2000 ) ;
 
-      setTimeout( function()  { self.revolution()}, 3000 ) ;
+      setTimeout( () =>  {
+        setInterval( () => {self.revolution()}, 2000 );
+      }, 2000);
     },
 
     eventSubsribe(){
@@ -44,14 +45,14 @@ $(function(){
       const slides = self.container.find(".slide");
       slides.each( (index, element) => {
         const angleDegree     = self.shifts[$(element).attr("src")].angleDegree;
-        const newAngleDegree = angleDegree + 360/slides.length;
+        const newAngleDegree = angleDegree + self.angle;
         const newAngleRadian  = self.degreeToRadian(newAngleDegree);
         const newPosX     = self.radius * Math.cos( newAngleRadian );
         const newPosY     = self.radius * Math.sin( newAngleRadian );
         self.setShift($(element).attr("src"), newAngleDegree, newAngleRadian, newPosX, newPosY);
         $(element)
         .css({
-           transform: `translateX(${newPosX}px) translateY(${newPosY}px) rotate(${self.random(1,20)*360}deg) scale(0.3)`,
+           transform: `translateX(${newPosX}px) translateY(${newPosY}px) scale(0.3)`,
          });
       });
     },
@@ -90,7 +91,7 @@ $(function(){
     setActive( target ){
       this.removeActive();
       $(target).siblings(".slide").removeClass("red-border");
-      var clickedClone = $(target).clone().removeClass().css('transform', '').addClass("active");
+      var clickedClone = $(target).clone().removeClass().css('transform', 'scale(0.5)').addClass("active");
       this.container.append(clickedClone);
     },
 
