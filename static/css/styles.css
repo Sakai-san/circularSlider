@@ -28,3 +28,47 @@
   width: 50%;
   height: calc(100% / 2);
 }
+
+
+@keyframes rotate360 {
+  0% {
+    transform: rotate(0deg);
+    background: #f00;
+    animation-timing-function: ease;
+  }
+  100% {
+    transform: rotate(30deg);
+    background: #f00;
+    animation-timing-function: linear;
+  }
+}
+
+@keyframes sunrise {
+  0% {
+    background: #f00;
+    left: 340px;
+    bottom: 0;
+    animation-timing-function: ease;
+  }
+
+  33% {
+    bottom: 340px;
+    left: 340px;
+    background: #ffd630;
+    animation-timing-function: linear;
+  }
+
+  66% {
+    left: 40px;
+    bottom: 340px;
+    background: #ffd630;
+    animation-timing-function: step(4);
+  }
+
+  100% {
+    bottom: 0;
+    left: 40px;
+    background: #f00;
+    animation-timing-function: linear;
+  }
+}

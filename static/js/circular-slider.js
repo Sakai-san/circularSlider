@@ -6,7 +6,7 @@ $(function(){
     container: null,
     items : null,
     angle : 0,
-    vectors: [],
+    shifts: {},
     radius : 0,
 
     init : function(container, radius,){
@@ -16,10 +16,12 @@ $(function(){
       this.setActive( this.container.find(".slide").first() );
       this.angle = items.length > 0 ? 360/items.length : 0;
       this.eventSubsribe();
-      this.computetPositions();
+      this.computeShifts();
       this.moveImages();
       const self = this;
       setTimeout( function()  { self.round(); }, 2000 ) ;
+
+      setTimeout( function()  { self.revolution()}, 3000 ) ;
     },
 
     eventSubsribe(){
@@ -37,14 +39,50 @@ $(function(){
       return Math.floor(Math.random() * (max - min + 1) + min);
     },
 
-    computetPositions(){
+    revolution(){
+      const self = this;
+      const slides = self.container.find(".slide");
+    //   slides.reverse();
+
+      slides.each( (index, element) => {
+        const angleDegree     = self.shift[$(element).attr("src")].angleDegree;
+        const newAngleDegree  = angleDegree + 360/slides.length;
+        const newAngleRadian  = self.degreeToRadian(angleDegree);
+        const newPosX     = self.radius * Math.cos( newAngleRadian );
+        const newPosY     = self.radius * Math.sin( newAngleRadian );
+        self.setShift($(element).attr("src"), newAngleDegree, newAngleRadian, newPosX, newPosY);
+        $(element)
+        .css({
+           transform: `translateX(${newPosX}px) translateY(${newPosY}px) rotate(${self.random(1,20)*360}deg) scale(0.3)`,
+         });
+      });
+    },
+
+    diagonal( angle, semiHeight ){
+      return semiHeight / Math.sin( angle);
+    },
+
+    setShift(imageSource, angleDegree, angleRadian, coordinateX, coordinateY ){
+      this.shifts[imageSource] =
+        {
+           angleDegree  : angleDegree,
+           angleRadian  : angleRadian,
+           posX         : coordinateX,
+           posY         : coordinateY,
+        };
+    },
+
+    computeShifts(){
       const self = this;
        self.container.find(".slide").each( (index, element) => {
          const angleDegree = index* self.angle;
          const angleRadian = self.degreeToRadian(angleDegree);
-         const coordinateX = self.radius * Math.cos( angleRadian );
-         const coordinateY = self.radius * Math.sin( angleRadian );
-         self.vectors.push([coordinateX, coordinateY]);
+         const internalRadius = self.radius -  self.diagonal(angleRadian, $(element).height()*0.3 /2) ;
+         console.log(internalRadius);
+         const subtraction = Math.max( $(element).width() / 2, $(element).height() / 2 ) *0;
+         const coordinateX = self.radius * Math.cos( angleRadian ) - subtraction*0.3;
+         const coordinateY = self.radius * Math.sin( angleRadian ) - subtraction*0.3;
+         self.setShift($(element).attr("src"), angleDegree, angleRadian, coordinateX, coordinateY);
        });
     },
 
@@ -54,7 +92,7 @@ $(function(){
 
     setActive( target ){
       this.removeActive();
-      $(target).siblings(".slide").removeClass("red-border");       
+      $(target).siblings(".slide").removeClass("red-border");
       var clickedClone = $(target).clone().removeClass().css('transform', '').addClass("active");
       this.container.append(clickedClone);
     },
@@ -62,22 +100,27 @@ $(function(){
     moveImages(){
       const self = this;
        self.container.find(".slide").each( (index, element) => {
-         const vector = self.vectors[index];
+         const shift = self.shifts[$(element).attr("src")];
          const hasRotation = self.random(0,10) > 8 ? true : false;
+
          if(hasRotation){
-           $(element)
-            .css({
-               transform: `translateX(${vector[0]}px) translateY(${vector[1]}px) rotate(${self.random(1,20)*360}deg) scale(0.3)`,
-             });
+           if( index === 10000 ){
+             $(element).css({ animation: 'sunrise 2s 1s infinite alternate'});
+           }
+           else{
+             $(element)
+              .css({
+                 transform: `translateX(${shift.posX}px) translateY(${shift.posY}px) rotate(${self.random(1,20)*360}deg) scale(0.3)`,
+               });
+             }
           }
           else{
             $(element)
              .css({
-                transform: `translateX(${vector[0]}px) translateY(${vector[1]}px) scale(0.3)`,
+                transform: `translateX(${shift.posX}px) translateY(${shift.posY}px) scale(0.3)`,
               })
           }
-       });
-
+      });
     },
 
     round(){
@@ -97,6 +140,5 @@ $(function(){
   };
 
 
-
-  circularSlider.init( $("#circular-slider"), $(window).width() / 2 -60);
+  circularSlider.init( $("#circular-slider"), $(window).width() /  4.1);
 });
