@@ -6,20 +6,21 @@ $(function(){
     container: null,
     items : null,
     angle : 0,
-    slides: {},
+    slidesWithPositions : {},
     radius : 0,
+    test : {},
+
 
     init : function(container, radius,){
       this.container = container;
       this.radius   = radius;
       const items = container.find(".slide");
-      this.setActive( this.container.find(".slide").first() );
+//      this.setActive( this.container.find(".slide").first() );
       this.angle = items.length > 0 ? 360/items.length : 0;
       this.eventSubsribe();
       this.computeShifts();
       this.moveImages();
       const self = this;
-
       setTimeout( () =>  {
         setInterval( () => {self.revolution()}, 2000 );
       }, 2000);
@@ -44,12 +45,12 @@ $(function(){
       const self = this;
       const slides = self.container.find(".slide");
       slides.each( (index, element) => {
-        const angleDegree     = self.shifts[$(element).attr("src")].angleDegree;
-        const newAngleDegree = angleDegree + self.angle;
+        const angleDegree     = self.slidesWithPositions[$(element).attr("src")].angleDegree;
+        const newAngleDegree  = angleDegree + self.angle;
         const newAngleRadian  = self.degreeToRadian(newAngleDegree);
-        const newPosX     = self.radius * Math.cos( newAngleRadian );
-        const newPosY     = self.radius * Math.sin( newAngleRadian );
-        self.setShift($(element).attr("src"), newAngleDegree, newAngleRadian, newPosX, newPosY);
+        const newPosX         = self.radius * Math.cos( newAngleRadian );
+        const newPosY         = self.radius * Math.sin( newAngleRadian );
+        self.setSlideWithPositions($(element).attr("src"), newAngleDegree, newAngleRadian, newPosX, newPosY);
         $(element)
         .css({
            transform: `translateX(${newPosX}px) translateY(${newPosY}px) scale(0.3)`,
@@ -61,12 +62,14 @@ $(function(){
       return semiHeight / Math.sin( angle);
     },
 
-    setShift(imageSource, angleDegree, angleRadian, coordinateX, coordinateY ){
-      this.shifts[imageSource] = {
+    setSlideWithPositions(imageSource, angleDegree, angleRadian, coordinateX, coordinateY, price=null, ingredients=null ){
+      this.slidesWithPositions[imageSource] = {
          angleDegree  : angleDegree,
          angleRadian  : angleRadian,
          posX         : coordinateX,
          posY         : coordinateY,
+         price        : !price && this.slidesWithPositions[imageSource] && this.slidesWithPositions[imageSource].price ? this.slidesWithPositions[imageSource].price : price,
+         ingredients  : !ingredients && this.slidesWithPositions[imageSource] && this.slidesWithPositions[imageSource].ingredients ? this.slidesWithPositions[imageSource].ingredients : ingredients
       };
     },
 
@@ -80,7 +83,8 @@ $(function(){
          const subtraction = Math.max( $(element).width() / 2, $(element).height() / 2 ) *0;
          const coordinateX = self.radius * Math.cos( angleRadian ) - subtraction*0.3;
          const coordinateY = self.radius * Math.sin( angleRadian ) - subtraction*0.3;
-         self.setShift($(element).attr("src"), angleDegree, angleRadian, coordinateX, coordinateY);
+         self.setSlideWithPositions($(element).attr("src"), angleDegree, angleRadian, coordinateX, coordinateY, $(element).data("price"));
+         console.log("toma", self.slidesWithPositions);
        });
     },
 
@@ -98,7 +102,7 @@ $(function(){
     moveImages(){
       const self = this;
        self.container.find(".slide").each( (index, element) => {
-         const shift = self.shifts[$(element).attr("src")];
+         const shift = self.slidesWithPositions[$(element).attr("src")];
          const hasRotation = self.random(0,10) > 8 ? true : false;
 
          if(hasRotation){
