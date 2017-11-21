@@ -15,7 +15,6 @@ $(function(){
       this.angleDegree = items.length > 0 ? 360/items.length : 0;
       this.angleRadian = self.degreeToRadian(self.angleDegree);
       this.eventSubsribe();
-      this.computeShifts();
       this.moveImages();
       setTimeout( () =>  {
         setInterval( () => {self.revolution()}, 900 );
@@ -45,18 +44,26 @@ $(function(){
       return [posX, posY];
     },
 
+    updateInfo(element){
+      $(".info")
+        .css({
+          transform: "scale(0.6)"
+        })
+       .text( this.slidesWithPositions[$(element).attr("src")].description);
+    },
+
     revolution(){
       const self = this;
-      const slides = self.container.find(".slide");
-      slides.each( (index, element) => {
+      self.container.find(".slide").each( (index, element) => {
+        self.updateInfo(element);
         const elementCustom   = self.slidesWithPositions[$(element).attr("src")];
         const newAngleRadian  = elementCustom.angleRadian + self.angleRadian;
         const positions       = self.computePosition(newAngleRadian, element, 0.3);
         self.setSlideWithPositions($(element).attr("src"), elementCustom.angleDegree + self.angleDegree, newAngleRadian, positions[0], positions[1]);
         $(element)
-        .css({
-           transform: `translateX(${positions[0]}px) translateY(${positions[1]}px) scale(0.3)`,
-         });
+          .css({
+             transform: `translateX(${positions[0]}px) translateY(${positions[1]}px) scale(0.3)`,
+           });
       });
     },
 
@@ -64,24 +71,22 @@ $(function(){
       return semiHeight / Math.sin( angle);
     },
 
-    setSlideWithPositions(imageSource, angleDegree, angleRadian, coordinateX, coordinateY, price=null, ingredients=null ){
+    setSlideWithPositions(imageSource, angleDegree, angleRadian, coordinateX, coordinateY, price=null, description=null, ingredients=null ){
       this.slidesWithPositions[imageSource] = {
          angleDegree  : angleDegree,
          angleRadian  : angleRadian,
          posX         : coordinateX,
          posY         : coordinateY,
          price        : !price && this.slidesWithPositions[imageSource] && this.slidesWithPositions[imageSource].price ? this.slidesWithPositions[imageSource].price : price,
+         description  : !description && this.slidesWithPositions[imageSource] && this.slidesWithPositions[imageSource].description ? this.slidesWithPositions[imageSource].description : description,
          ingredients  : !ingredients && this.slidesWithPositions[imageSource] && this.slidesWithPositions[imageSource].ingredients ? this.slidesWithPositions[imageSource].ingredients : ingredients
       };
     },
 
-    computeShifts(){
-      const self = this;
-       self.container.find(".slide").each( (index, element) => {
-         const angleRadian = index*self.angleRadian;
-         const positions = self.computePosition(angleRadian, element, 0.3);
-         self.setSlideWithPositions($(element).attr("src"), index*self.angleDegree, angleRadian, positions[0], positions[1], $(element).data("price"));
-       });
+    doShift( index, element){
+       const angleRadian = index*this.angleRadian;
+       const positions = this.computePosition(angleRadian, element, 0.3);
+       this.setSlideWithPositions($(element).attr("src"), index*this.angleDegree, angleRadian, positions[0], positions[1], $(element).data("price"), $(element).data("description"));
     },
 
     removeActive(){
@@ -98,9 +103,9 @@ $(function(){
     moveImages(){
       const self = this;
        self.container.find(".slide").each( (index, element) => {
+         self.doShift(index, element);
          const shift = self.slidesWithPositions[$(element).attr("src")];
          const hasRotation = self.random(0,10) > 8 ? true : false;
-
          if(hasRotation){
            if( index === 10000 ){
              $(element).css({ animation: 'sunrise 2s 1s infinite alternate'});

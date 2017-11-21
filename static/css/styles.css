@@ -1,4 +1,4 @@
-.slide {
+.slide, .info {
   position: absolute;
   top: calc(100% / 4 );
   left: 25%;
@@ -6,7 +6,7 @@
   width: 50%;
   height: calc(100% / 2);
   transform-origin: 50% 50%;
-  transition: transform linear 1.2s;
+  transition: transform linear 0.9s;
 }
 
 .slide:hover {
