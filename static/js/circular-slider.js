@@ -18,7 +18,7 @@ $(function(){
       this.computeShifts();
       this.moveImages();
       setTimeout( () =>  {
-        setInterval( () => {self.revolution()}, 2000 );
+        setInterval( () => {self.revolution()}, 900 );
       }, 2000);
     },
 
@@ -38,8 +38,8 @@ $(function(){
     },
 
     computePosition(angleRadian, thumbnail, scaleFactor){
-      const outerRadius     = Math.max( $(window).width(), $(window).height() ) / 2;
-      const innerRadius     = outerRadius - Math.max( $(thumbnail).width(), $(thumbnail).height() ) / 2;
+      const outerRadius     = Math.min( $(window).width(), $(window).height() ) / 2;
+      const innerRadius     = outerRadius - Math.min( $(thumbnail).width()*scaleFactor, $(thumbnail).height()*scaleFactor) / 2;
       const posX            = innerRadius * Math.cos( angleRadian );
       const posY            = innerRadius * Math.sin( angleRadian );
       return [posX, posY];

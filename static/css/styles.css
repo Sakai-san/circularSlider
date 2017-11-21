@@ -6,7 +6,7 @@
   width: 50%;
   height: calc(100% / 2);
   transform-origin: 50% 50%;
-  transition: transform ease-out 1.5s;
+  transition: transform linear 1.2s;
 }
 
 .slide:hover {
