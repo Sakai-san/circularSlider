@@ -16,17 +16,16 @@ $(function(){
       this.angleRadian = self.degreeToRadian(self.angleDegree);
       this.eventSubsribe();
       this.moveImages();
-      const intervalHandle = setInterval(
-        () => self.fastRevolution(100)
+      const highFrequenceHandle = setInterval(
+        () => self.revolution(100, 'ease-out', true)
         , 100
       );
 
       setTimeout( () =>  {
-        clearInterval(intervalHandle);
-        setInterval( () => {self.revolution()}, 6000 );
+        clearInterval(highFrequenceHandle);
+        setInterval( () => {self.revolution(6000, 'linear')}, 6000 );
       }, 5000);
     },
-
 
     eventSubsribe(){
       const self = this;
@@ -59,25 +58,9 @@ $(function(){
        .text( this.slidesWithPositions[$(element).attr("src")].description);
     },
 
-    revolution(){
+    revolution( motionDuration, easing, isDurationAsymmetric=false){
       const self = this;
-      self.container.find(".slide").each( (index, element) => {
-        self.updateInfo(element);
-        const elementCustom   = self.slidesWithPositions[$(element).attr("src")];
-        const newAngleRadian  = elementCustom.angleRadian + self.angleRadian;
-        const positions       = self.computePosition(newAngleRadian, element, 0.3);
-        self.setSlideWithPositions($(element).attr("src"), elementCustom.angleDegree + self.angleDegree, newAngleRadian, positions[0], positions[1]);
-        $(element)
-          .css({
-              transform: `translateX(${positions[0]}px) translateY(${positions[1]}px) scale(0.3)`,
-              transition: `transform linear 6s`,
-           });
-      });
-    },
-
-    fastRevolution( timeout ){
-      const self = this;
-      const asymetricDuration = self.random(1, 6)*timeout;
+      const asymetricDuration = isDurationAsymmetric ? self.random(1, 6)*motionDuration : motionDuration;
       self.container.find(".slide").each( (index, element) => {
         const elementCustom   = self.slidesWithPositions[$(element).attr("src")];
         const newAngleRadian  = elementCustom.angleRadian + self.angleRadian;
@@ -85,14 +68,10 @@ $(function(){
         self.setSlideWithPositions($(element).attr("src"), elementCustom.angleDegree + self.angleDegree, newAngleRadian, positions[0], positions[1]);
         $(element)
           .css({
-            transition: `transform ease-out ${asymetricDuration}ms`,
+            transition: `transform ${easing} ${asymetricDuration}ms`,
             transform: `translateX(${positions[0]}px) translateY(${positions[1]}px) scale(0.3)`,
            });
       });
-    },
-
-    diagonal( angle, semiHeight ){
-      return semiHeight / Math.sin( angle);
     },
 
     setSlideWithPositions(imageSource, angleDegree, angleRadian, coordinateX, coordinateY, price=null, description=null, ingredients=null ){
