@@ -9,6 +9,7 @@ $(function(){
 
     init : function(container, radius,){
       const self = this;
+      self.speedEventSubsribe();
       this.container = container;
       const items = container.find(".slide");
 //      this.setActive( this.container.find(".slide").first() );
@@ -16,21 +17,29 @@ $(function(){
       this.angleRadian = self.degreeToRadian(self.angleDegree);
       this.eventSubsribe();
       this.moveImages();
-      const highFrequenceHandle = setInterval(
-        () => self.revolution(100, 'ease-out', true)
-        , 100
-      );
+      let highFrequenceHandle = null;
+      setTimeout( () => {
+        highFrequenceHandle = setInterval(
+          () => self.revolution(100, 'ease-out', true), 100);
+        }, 2000);
 
-      setTimeout( () =>  {
+      setTimeout( () => {
         clearInterval(highFrequenceHandle);
-        setInterval( () => {self.revolution(6000, 'linear')}, 6000 );
-      }, 5000);
+        setInterval( () => self.revolution(6000, 'linear'), 6000 );
+        }, 5000);
     },
 
     eventSubsribe(){
       const self = this;
       self.container.find(".slide").hover( function(){
         self.setActive( $(this) );
+      });
+    },
+
+    speedEventSubsribe(){
+      const range = $("#speedRange");
+      range.change( () => {
+        console.log("speed", range.val());
       });
     },
 
